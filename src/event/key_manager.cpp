@@ -2,6 +2,7 @@
 #include "handle/edit_handle.h"
 #include "handle/page_handle.h"
 #include "handle/setting_execute.h"
+#include "handle/key_position.h"
 #include "handle/set_data.h"
 #include "setting/mcm_setting.h"
 
@@ -105,6 +106,7 @@ namespace event {
                 continue;
             }
 
+            // HOLD TO SAVE SETTINGS
             if (!RE::PlayerCharacter::GetSingleton()->IsInCombat()) {
                 if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() &&
                     (
@@ -157,13 +159,6 @@ namespace event {
                 continue;
             }
 
-            if (button->IsPressed() && is_key_valid(key_toggle_) && key_ == key_toggle_) {
-                logger::debug("configured toggle key ({}) is pressed"sv, key_);
-                const auto handler = handle::page_handle::get_singleton();
-                handler->set_active_page(handler->get_next_page_id());
-
-                reset_edit();
-            }
 
 
             if (button->IsPressed() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==
@@ -176,7 +171,7 @@ namespace event {
                 auto edit_position = edit_handle->get_position();
                 if (const auto page_handle = handle::page_handle::get_singleton();
                     edit_position == page_setting->pos && edit_page == page_handle->
-                    get_active_page_id() && key_ == edit_active_) {
+                    get_active_page_id(edit_position) && key_ == edit_active_) {
                     const auto message = fmt::format("Exit Edit Mode for Position {}, persisting Setting."sv,
                         static_cast<uint32_t>(page_setting->pos));
                     RE::DebugNotification(message.c_str());
@@ -201,6 +196,13 @@ namespace event {
                     break;
                 }
 
+
+                const auto handler = handle::page_handle::get_singleton();
+                const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
+                handler->set_active_page(handler->get_next_page_id(position),position);
+
+                reset_edit();
+                
                 handle::setting_execute::execute_settings(page_setting->slot_settings);
 
                 break;

@@ -11,7 +11,7 @@ namespace handle {
             this->data_ = new edit_handle_data();
         }
         const auto page_handle = page_handle::get_singleton();
-        auto page = page_handle->get_active_page_id();
+        auto page = page_handle->get_active_page_id(a_position);
         logger::trace("init edit for page {}, position {}"sv, page, static_cast<uint32_t>(a_position));
 
         std::vector<data_helper*> data_helpers;

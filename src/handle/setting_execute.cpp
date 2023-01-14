@@ -51,7 +51,7 @@ namespace handle {
         }
 
         const auto page_handle = page_handle::get_singleton();
-        auto page = page_handle->get_active_page_id();
+        auto page = page_handle->get_next_page_id(position);
         const auto page_setting = page_handle->get_page_setting(page, position);
         if (page_setting == nullptr) {
             logger::warn("nothing to do, nothing set. return."sv);

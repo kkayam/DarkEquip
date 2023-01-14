@@ -17,14 +17,14 @@ namespace handle {
             uint32_t a_opacity,
             key_position*& a_key_pos);
 
-        void set_active_page(uint32_t a_page) const;
+        void set_active_page(uint32_t a_page,const page_setting::position a_position) const;
 
         [[nodiscard]] page_setting* get_page_setting(uint32_t a_page, page_setting::position a_position) const;
         [[nodiscard]] std::map<page_setting::position, page_setting*> get_page(uint32_t a_page) const;
         [[nodiscard]] std::map<uint32_t, std::map<page_setting::position, page_setting*>> get_pages() const;
         [[nodiscard]] std::map<page_setting::position, page_setting*> get_active_page() const;
-        [[nodiscard]] uint32_t get_active_page_id() const;
-        [[nodiscard]] uint32_t get_next_page_id() const;
+        [[nodiscard]] uint32_t get_active_page_id(const page_setting::position a_position) const;
+        [[nodiscard]] uint32_t get_next_page_id(const page_setting::position a_position) const;
 
         page_handle(const page_handle&) = delete;
         page_handle(page_handle&&) = delete;
@@ -57,7 +57,7 @@ namespace handle {
 
         struct page_handle_data {
             std::map<uint32_t, std::map<page_setting::position, page_setting*>> page_settings;
-            uint32_t active_page = 0;
+            uint32_t active_page[4] = {0,0,0,0};
         };
 
         page_handle_data* data_;

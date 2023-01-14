@@ -92,7 +92,7 @@ namespace handle {
             static_cast<uint32_t>(a_position));
     }
 
-    void page_handle::set_active_page(const uint32_t a_page) const {
+    void page_handle::set_active_page(const uint32_t a_page,const page_setting::position a_position) const {
         if (!this->data_) {
             return;
         }
@@ -100,7 +100,7 @@ namespace handle {
 
         logger::trace("set active page to {}"sv, a_page);
 
-        data->active_page = a_page;
+        data->active_page[static_cast<int32_t>(a_position)] = a_page;
     }
 
     page_setting* page_handle::get_page_setting(const uint32_t a_page, const page_setting::position a_position) const {
@@ -128,22 +128,29 @@ namespace handle {
 
     std::map<page_setting::position, page_setting*> page_handle::get_active_page() const {
         if (const page_handle_data* data = this->data_; data && !data->page_settings.empty()) {
-            return data->page_settings.at(data->active_page);
+            std::map<page_setting::position, page_setting*> active_page;
+            for (int32_t i = 0; i < 4; i++)
+            {
+                std::map<page_setting::position, page_setting*> tmp = data->page_settings.at(data->active_page[i]);
+                active_page[static_cast<page_setting::position>(i)] = tmp[static_cast<page_setting::position>(i)];
+            }
+            
+            return active_page;
         }
         return {};
     }
 
-    uint32_t page_handle::get_active_page_id() const {
+    uint32_t page_handle::get_active_page_id(const page_setting::position a_position) const {
         if (const page_handle_data* data = this->data_; data) {
-            return data->active_page;
+            return data->active_page[static_cast<int32_t>(a_position)];
         }
         return {};
     }
 
-    uint32_t page_handle::get_next_page_id() const {
+    uint32_t page_handle::get_next_page_id(const page_setting::position a_position) const {
         if (const page_handle_data* data = this->data_; data) {
             //lets make it easy for now
-            if (data->active_page == 0) {
+            if (data->active_page[static_cast<int32_t>(a_position)] == 0) {
                 return 1;
             }
             return 0;
