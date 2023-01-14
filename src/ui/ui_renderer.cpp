@@ -497,8 +497,8 @@ namespace ui {
                 logger::error("failed to load texture {}"sv, path);
             }
 
-            a_struct[idx].width *= static_cast<int32_t>(get_resolution_scale_width());
-            a_struct[idx].height *= static_cast<int32_t>(get_resolution_scale_height());
+            a_struct[idx].width = static_cast<int32_t>(get_resolution_scale_width()*a_struct[idx].width);
+            a_struct[idx].height = static_cast<int32_t>(get_resolution_scale_height()*a_struct[idx].height);
         }
     }
 
