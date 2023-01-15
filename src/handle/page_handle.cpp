@@ -153,10 +153,12 @@ namespace handle {
         handle::set_data::clear_slot(page_setting::position::right);
         handle::set_data::clear_slot(page_setting::position::left);
         handle::set_data::clear_slot(page_setting::position::bottom);
+        handle::set_data::clear_slot(page_setting::position::top);
 
         int slot_index_right = 0;
         int slot_index_left = 0;
         int slot_index_bottom = 0;
+        int slot_index_top = 0;
         for (const auto& [item, inv_data] : player->GetInventory()) {
             if (const auto& [count, entry] = inv_data; entry->IsFavorited() ) {
                 std::vector<data_helper*> data;
@@ -178,10 +180,12 @@ namespace handle {
                     slot_index_left++;
                 }
                 if(entry->object->Is(RE::FormType::AlchemyItem)){
-                    item_data_helper->type = handle::slot_setting::slot_type::consumable;
-                    data.push_back(item_data_helper);
-                    handle::set_data::set_single_slot(slot_index_bottom,page_setting::position::bottom,data);
-                    slot_index_bottom++;
+                    if (slot_index_bottom==0){
+                        item_data_helper->type = handle::slot_setting::slot_type::consumable;
+                        data.push_back(item_data_helper);
+                        handle::set_data::set_single_slot(slot_index_bottom,page_setting::position::bottom,data);
+                        slot_index_bottom++;
+                    }
                 }
             }
         }
@@ -197,11 +201,23 @@ namespace handle {
                 handle::set_data::set_single_slot(slot_index_left,page_setting::position::left,data);
                 slot_index_left++;
             }
+            if (form->Is(RE::FormType::Shout)) {
+                std::vector<data_helper*> data;
+                auto item_data_helper = new data_helper();
+                item_data_helper->form = RE::TESForm::LookupByID(form->formID);
+                item_data_helper->action_type = handle::slot_setting::acton_type::default_action;
+                item_data_helper->type = handle::slot_setting::slot_type::shout;
+                item_data_helper->left = true;
+                data.push_back(item_data_helper);
+                handle::set_data::set_single_slot(slot_index_top,page_setting::position::top,data);
+                slot_index_top++;
+            }
         }
         page_handle_data* data = this->data_;
         data->active_page_max[static_cast<int32_t>(page_setting::position::right)] = slot_index_right;
         data->active_page_max[static_cast<int32_t>(page_setting::position::left)] = slot_index_left;
-        data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = slot_index_bottom;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = 1;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::top)] = slot_index_top;
     }
     
 

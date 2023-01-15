@@ -44,6 +44,7 @@ namespace ui {
             float a_offset_x,
             float a_offset_y,
             const char* a_text,
+            float font_size_mul = 1,
             ImU32 a_color = IM_COL32_WHITE);
 
         static void draw_element(ID3D11ShaderResourceView* a_texture,

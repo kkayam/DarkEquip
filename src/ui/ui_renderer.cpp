@@ -3,6 +3,7 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 #include <dxgi.h>
+#include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -176,14 +177,16 @@ namespace ui {
 
     ui_renderer::ui_renderer() = default;
 
+    
     void ui_renderer::draw_text(const float a_x,
         const float a_y,
         const float a_offset_x,
         const float a_offset_y,
         const char* a_text,
+        float font_size_mul,
         const ImU32 a_color) {
         const ImFont* font = ImGui::GetFont();
-        const auto font_size = config::mcm_setting::get_slot_count_text_font_size();
+        const auto font_size = config::mcm_setting::get_slot_count_text_font_size()*font_size_mul;
 
         //get data from normal hud, and add an offset config for each image
         const auto width_setting = config::mcm_setting::get_hud_image_position_width();
@@ -300,6 +303,20 @@ namespace ui {
                     offset_setting->offset_slot_x,
                     offset_setting->offset_slot_y,
                     std::to_string(slot_settings.front()->item_count).c_str());
+            }
+            if (auto slot_settings = page_setting->slot_settings;
+                !slot_settings.empty() && slot_settings.front()->form->Is(RE::FormType::Shout)) {
+                std::string text = slot_settings.front()->form->GetName();
+                
+                if (text.length() > 10){
+                    text = text.substr(0, 11) + "...";
+                }
+                draw_text(a_x,
+                    a_y,
+                    offset_setting->offset_slot_x,
+                    offset_setting->offset_slot_y,
+                    text.c_str(),
+                    0.75);
             }
         }
     }
@@ -543,4 +560,5 @@ namespace ui {
     float ui_renderer::get_resolution_width() { return ImGui::GetIO().DisplaySize.x; }
 
     float ui_renderer::get_resolution_height() { return ImGui::GetIO().DisplaySize.y; }
+
 }
