@@ -15,11 +15,11 @@ namespace event {
 
     RE::BSEventNotifyControl MenuOpenCloseEventHandler::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*)
     {
-        if (a_event && !a_event->opening && a_event->menuName == "InventoryMenu") {
-            handle::page_handle::compile_pages_inventory();
-        }
-        if (a_event && !a_event->opening && a_event->menuName == "MagicMenu") {
-            RE::DebugNotification("menu closed");
+        if (a_event && !a_event->opening ) {
+            if(a_event->menuName == "InventoryMenu" || a_event->menuName == "MagicMenu"){
+                const auto handler = handle::page_handle::get_singleton();
+                handler->compile_pages();
+            }
         }
         return RE::BSEventNotifyControl::kContinue;
     }

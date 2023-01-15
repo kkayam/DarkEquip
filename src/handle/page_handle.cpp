@@ -148,7 +148,7 @@ namespace handle {
         return {};
     }
 
-    void page_handle::compile_pages_inventory() const {
+    void page_handle::compile_pages() const {
         const auto player = RE::PlayerCharacter::GetSingleton();
         handle::set_data::clear_slot(page_setting::position::right);
         handle::set_data::clear_slot(page_setting::position::left);
@@ -174,30 +174,40 @@ namespace handle {
                     item_data_helper->type = handle::slot_setting::slot_type::shield;
                     item_data_helper->left = true;
                     data.push_back(item_data_helper);
-                    handle::set_data::set_single_slot(slot_index_left,page_setting::position::right,data);
+                    handle::set_data::set_single_slot(slot_index_left,page_setting::position::left,data);
                     slot_index_left++;
                 }
-                // if(entry->object->Is()){
-                //     item_data_helper->type = handle::slot_setting::slot_type::shield;
-                //     item_data_helper->left = true;
-                //     data.push_back(item_data_helper);
-                //     handle::set_data::set_single_slot(slot_index_left,page_setting::position::right,data);
-                //     slot_index_left++;
-                // }
+                if(entry->object->Is(RE::FormType::AlchemyItem)){
+                    item_data_helper->type = handle::slot_setting::slot_type::consumable;
+                    data.push_back(item_data_helper);
+                    handle::set_data::set_single_slot(slot_index_bottom,page_setting::position::bottom,data);
+                    slot_index_bottom++;
+                }
             }
         }
-
+        for (auto magic_favorites = RE::MagicFavorites::GetSingleton()->spells; auto form : magic_favorites) {
+            if (form->Is(RE::FormType::Spell)) {
+                std::vector<data_helper*> data;
+                auto item_data_helper = new data_helper();
+                item_data_helper->form = RE::TESForm::LookupByID(form->formID);
+                item_data_helper->action_type = handle::slot_setting::acton_type::default_action;
+                item_data_helper->type = handle::slot_setting::slot_type::magic;
+                item_data_helper->left = true;
+                data.push_back(item_data_helper);
+                handle::set_data::set_single_slot(slot_index_left,page_setting::position::left,data);
+                slot_index_left++;
+            }
+        }
+        page_handle_data* data = this->data_;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::right)] = slot_index_right;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::left)] = slot_index_left;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = slot_index_bottom;
     }
+    
 
     uint32_t page_handle::get_next_page_id(const page_setting::position a_position) const {
-        if (const page_handle_data* data = this->data_; data) {
-            //lets make it easy for now
-            if (data->active_page[static_cast<int32_t>(a_position)] == 0) {
-                return 1;
-            }
-            return 0;
-        }
-        return {};
+        page_handle_data* data = this->data_;
+        return (data->active_page[static_cast<int32_t>(a_position)]+1)%(data->active_page_max[static_cast<int32_t>(a_position)]);
     }
 
     void page_handle::get_offset_values(const page_setting::position a_position,

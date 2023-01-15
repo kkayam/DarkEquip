@@ -1,4 +1,5 @@
 #pragma once
+#include "handle/page_handle.h"
 
 namespace event {
     class MenuOpenCloseEventHandler final: public RE::BSTEventSink<RE::MenuOpenCloseEvent>
