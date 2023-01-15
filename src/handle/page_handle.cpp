@@ -1,6 +1,7 @@
 ﻿#include "page_handle.h"
 #include "equip/equip_slot.h"
 #include "util/string_util.h"
+#include "handle/set_data.h"
 
 namespace handle {
     page_handle* page_handle::get_singleton() {
@@ -145,6 +146,47 @@ namespace handle {
             return data->active_page[static_cast<int32_t>(a_position)];
         }
         return {};
+    }
+
+    void page_handle::compile_pages_inventory() const {
+        const auto player = RE::PlayerCharacter::GetSingleton();
+        handle::set_data::clear_slot(page_setting::position::right);
+        handle::set_data::clear_slot(page_setting::position::left);
+        handle::set_data::clear_slot(page_setting::position::bottom);
+
+        int slot_index_right = 0;
+        int slot_index_left = 0;
+        int slot_index_bottom = 0;
+        for (const auto& [item, inv_data] : player->GetInventory()) {
+            if (const auto& [count, entry] = inv_data; entry->IsFavorited() ) {
+                std::vector<data_helper*> data;
+                auto item_data_helper = new data_helper();
+                item_data_helper->form = RE::TESForm::LookupByID(entry->object->formID);
+                item_data_helper->left = false;
+                item_data_helper->action_type = handle::slot_setting::acton_type::default_action;
+                if(entry->object->IsWeapon()){
+                    item_data_helper->type = handle::slot_setting::slot_type::weapon;
+                    data.push_back(item_data_helper);
+                    handle::set_data::set_single_slot(slot_index_right,page_setting::position::right,data);
+                    slot_index_right++;
+                }
+                if(entry->object->IsArmor()){
+                    item_data_helper->type = handle::slot_setting::slot_type::shield;
+                    item_data_helper->left = true;
+                    data.push_back(item_data_helper);
+                    handle::set_data::set_single_slot(slot_index_left,page_setting::position::right,data);
+                    slot_index_left++;
+                }
+                // if(entry->object->Is()){
+                //     item_data_helper->type = handle::slot_setting::slot_type::shield;
+                //     item_data_helper->left = true;
+                //     data.push_back(item_data_helper);
+                //     handle::set_data::set_single_slot(slot_index_left,page_setting::position::right,data);
+                //     slot_index_left++;
+                // }
+            }
+        }
+
     }
 
     uint32_t page_handle::get_next_page_id(const page_setting::position a_position) const {

@@ -12,6 +12,8 @@ namespace handle {
         static void set_single_slot(uint32_t a_page,
             page_setting::position a_pos,
             const std::vector<data_helper*>& a_data);
+        
+        static void clear_slot(const page_setting::position a_pos);
 
     private:
         static void set_empty_slot(int a_page, int a_pos, key_position*& a_key_pos);

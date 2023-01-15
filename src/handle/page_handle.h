@@ -25,7 +25,7 @@ namespace handle {
         [[nodiscard]] std::map<page_setting::position, page_setting*> get_active_page() const;
         [[nodiscard]] uint32_t get_active_page_id(const page_setting::position a_position) const;
         [[nodiscard]] uint32_t get_next_page_id(const page_setting::position a_position) const;
-
+        void compile_pages_inventory() const;
         page_handle(const page_handle&) = delete;
         page_handle(page_handle&&) = delete;
 

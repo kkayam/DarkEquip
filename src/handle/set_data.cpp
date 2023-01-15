@@ -43,6 +43,14 @@ namespace handle {
         logger::trace("done setting. return."sv);
     }
 
+    void set_data::clear_slot(const page_setting::position a_pos) {
+        auto key_pos = key_position::get_singleton();
+        key_pos->init_key_position_map();
+        for (auto i = 0; i < util::page_count; ++i) {
+            set_empty_slot(i, static_cast<uint32_t>(a_pos), key_pos);
+        }
+    }
+
     void set_data::set_new_item_count_if_needed(const RE::TESBoundObject* a_obj, const int32_t a_count) {
         set_new_item_count(a_obj->GetFormID(), a_obj->GetName(), a_count);
     }

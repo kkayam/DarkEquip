@@ -18,6 +18,8 @@ set(sources ${sources}
 	src/event/equip_event.h
 	src/event/key_manager.cpp
 	src/event/key_manager.h
+	src/event/MenuOpenCloseEventHandler.cpp
+	src/event/MenuOpenCloseEventHandler.h
 	src/event/sink_event.cpp
 	src/event/sink_event.h
 	src/handle/data/data_helper.h
