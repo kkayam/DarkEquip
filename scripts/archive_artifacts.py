@@ -24,6 +24,9 @@ def make_rel_archive(a_args):
                   "mcm/Config/LamasTinyHUD/config.json")
     archive.write(os.path.join(a_args.src_dir, "mcm", "Config", "LamasTinyHUD", "settings.ini"),
                   "mcm/Config/LamasTinyHUD/settings.ini")
+    
+    archive.write(os.path.join(a_args.src_dir, "mcm", "Interface", "controls", "pc","controlmap.txt"),
+                      "Interface/controls/pc/controlmap.txt")
     for lang in languages:
         archive.write(os.path.join(a_args.src_dir, "mcm", "Interface", "Translations", "LamasTinyHUD_english.txt"),
                       "Interface/Translations/LamasTinyHUD_" + lang + ".txt")
