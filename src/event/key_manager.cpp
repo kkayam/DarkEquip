@@ -106,29 +106,11 @@ namespace event {
                 continue;
             }
 
-            // HOLD TO SAVE SETTINGS
-            if (!RE::PlayerCharacter::GetSingleton()->IsInCombat()) {
-                if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() &&
-                    (
-                        key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_
-                        || key_ == key_left_action_)) {
-                    const auto edit_handle = handle::edit_handle::get_singleton();
-                    const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
-                    if (edit_handle->get_position() == handle::page_setting::position::total && edit_active_ ==
-                        k_invalid) {
-                        logger::debug("configured key ({}) is held, enter edit mode"sv, key_);
-                        edit_handle->init_edit(page_setting->pos);
-                        const auto message = fmt::format("Entered Edit Mode for Position {}"sv,
-                            static_cast<uint32_t>(page_setting->pos));
-                        RE::DebugNotification(message.c_str());
-                        edit_active_ = key_;
-                        break;
-                    }
-                }
-            } else {
-                reset_edit();
-            }
+            // TOGGLE POTION IF HOLD?
+            // if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() &&
+            //     key_ == key_bottom_action_) {
 
+            // }
 
             if (button->IsDown() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_
                                      || key_ == key_left_action_)) {

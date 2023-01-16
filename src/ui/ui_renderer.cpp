@@ -252,7 +252,7 @@ namespace ui {
             static_cast<float>(height) * 1.4f * config::mcm_setting::get_hud_image_scale_height() +
             config::file_setting::get_extra_size_for_image());
 
-        const ImU32 color = IM_COL32(a_modify, a_modify, a_modify, static_cast<uint32_t>(a_opacity*0.8));
+        const ImU32 color = IM_COL32(a_modify, a_modify, a_modify, a_opacity);
 
         draw_element(texture, center, size, angle, color);
     }
@@ -267,8 +267,8 @@ namespace ui {
                 a_y,
                 offset_setting->offset_slot_x,
                 offset_setting->offset_slot_y,
-                page_setting->button_press_modify,
-                page_setting->icon_opacity);
+                page_setting->icon_opacity,
+                page_setting->button_press_modify);
             draw_icon(a_x,
                 a_y,
                 offset_setting->offset_slot_x,
