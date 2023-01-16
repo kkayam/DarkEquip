@@ -156,10 +156,13 @@ namespace event {
             if (button->IsPressed() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==
                                         key_bottom_action_ || key_ == key_left_action_)) {
                 logger::debug("configured Key ({}) pressed"sv, key_);
-                const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
+                const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
+
                 const auto handler = handle::page_handle::get_singleton();
                 const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
-                handler->set_active_page(handler->get_next_page_id(position),position);
+                if(key_ !=key_bottom_action_){
+                    handler->set_active_page(handler->get_next_page_id(position),position);
+                }
                 
                 handle::setting_execute::execute_settings(page_setting->slot_settings);
 

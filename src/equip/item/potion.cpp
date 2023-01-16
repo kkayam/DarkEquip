@@ -1,5 +1,7 @@
 ﻿#include "potion.h"
 #include "inventory.h"
+#include "handle/page_handle.h"
+#include "handle/page/page_setting.h"
 
 namespace item {
     void potion::consume_potion(handle::slot_setting*& a_slot, RE::PlayerCharacter*& a_player) {
@@ -20,6 +22,8 @@ namespace item {
 
         if (obj == nullptr || left == 0) {
             logger::warn("could not find selected potion, maybe it all have been consumed"sv);
+            const auto handler = handle::page_handle::get_singleton();
+            handler->set_active_page(handler->get_next_page_id(handle::page_setting::position::bottom),handle::page_setting::position::bottom);
             //TODO update ui in this case
             return;
         }
@@ -33,6 +37,10 @@ namespace item {
 
         const auto equip_manager = RE::ActorEquipManager::GetSingleton();
         equip_manager->EquipObject(a_player, obj);
+        if (left == 1) {
+            const auto handler = handle::page_handle::get_singleton();
+            handler->set_active_page(handler->get_next_page_id(handle::page_setting::position::bottom),handle::page_setting::position::bottom);
+        }
         logger::trace("drank/ate potion/food {}. return."sv, obj->GetName());
     }
 }

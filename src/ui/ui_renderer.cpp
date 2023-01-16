@@ -349,7 +349,7 @@ namespace ui {
             return;
 
         if (const auto ui = RE::UI::GetSingleton(); !ui || ui->GameIsPaused() || !ui->IsCursorHiddenWhenTopmost() ||
-                                                    !ui->IsShowingMenus() || !ui->GetMenu<RE::HUDMenu>() || !ui->) {
+                                                    !ui->IsShowingMenus() || !ui->GetMenu<RE::HUDMenu>()) {
             return;
         }
 

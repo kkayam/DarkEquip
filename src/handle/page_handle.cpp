@@ -180,12 +180,10 @@ namespace handle {
                     slot_index_left++;
                 }
                 if(entry->object->Is(RE::FormType::AlchemyItem)){
-                    if (slot_index_bottom==0){
-                        item_data_helper->type = handle::slot_setting::slot_type::consumable;
-                        data.push_back(item_data_helper);
-                        handle::set_data::set_single_slot(slot_index_bottom,page_setting::position::bottom,data);
-                        slot_index_bottom++;
-                    }
+                    item_data_helper->type = handle::slot_setting::slot_type::consumable;
+                    data.push_back(item_data_helper);
+                    handle::set_data::set_single_slot(slot_index_bottom,page_setting::position::bottom,data);
+                    slot_index_bottom++;
                 }
             }
         }
@@ -227,7 +225,7 @@ namespace handle {
         page_handle_data* data = this->data_;
         data->active_page_max[static_cast<int32_t>(page_setting::position::right)] = slot_index_right;
         data->active_page_max[static_cast<int32_t>(page_setting::position::left)] = slot_index_left;
-        data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = 1;
+        data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = slot_index_bottom;
         data->active_page_max[static_cast<int32_t>(page_setting::position::top)] = slot_index_top;
     }
     
