@@ -57,14 +57,7 @@ namespace magic {
             return;
         }
 
-        if (a_action == handle::slot_setting::acton_type::instant) {
-            //might not consider daily cool downs
-            const auto actor = a_player->As<RE::Actor>();
-            actor->GetMagicCaster(RE::MagicSystem::CastingSource::kInstant)
-                 ->CastSpellImmediate(spell, false, actor, 1.0f, false, 0.0f, nullptr);
-        } else {
-            RE::ActorEquipManager::GetSingleton()->EquipSpell(a_player, spell);
-        }
+        RE::ActorEquipManager::GetSingleton()->EquipSpell(a_player, spell);
         logger::trace("worked power {} action {}. return."sv, a_form->GetName(), static_cast<uint32_t>(a_action));
     }
 }

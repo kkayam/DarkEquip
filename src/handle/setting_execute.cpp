@@ -64,6 +64,29 @@ namespace handle {
         return page_setting;
     }
 
+    
+    page_setting* setting_execute::get_current_page_setting_for_key(const uint32_t a_key) {
+        const auto position = key_position::get_singleton()->get_position_for_key(a_key);
+        if (position == page_setting::position::total) {
+            logger::warn("nothing to do, nothing set. return."sv);
+            return nullptr;
+        }
+
+        const auto page_handle = page_handle::get_singleton();
+        auto page = page_handle->get_active_page_id(position);
+        const auto page_setting = page_handle->get_page_setting(page, position);
+        if (page_setting == nullptr) {
+            logger::warn("nothing to do, nothing set. return."sv);
+        }
+        logger::debug("page {}, position is {}, setting count {}"sv,
+            page,
+            static_cast<uint32_t>(position),
+            page_setting->slot_settings.size());
+
+        return page_setting;
+    }
+
+
     void setting_execute::execute_setting(slot_setting*& a_slot, RE::PlayerCharacter*& a_player) {
         switch (a_slot->type) {
             case slot_setting::slot_type::unset:

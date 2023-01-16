@@ -112,23 +112,35 @@ namespace event {
 
             // }
 
+            if (updateBottomColor){
+                //set slot back to normal color
+                const auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_bottom_action_);
+                if (page_setting == nullptr) {
+                    logger::trace("setting for key {} is null. return."sv, key_);
+                    break;
+                }
+                page_setting->button_press_modify = ui::draw_full;
+                updateBottomColor = false;
+            }
+            
             if (button->IsDown() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_
                                      || key_ == key_left_action_)) {
-                logger::debug("configured key ({}) is down"sv, key_);
                 //set slot to a different color
-                const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
+                const auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
                 if (page_setting == nullptr) {
                     logger::trace("setting for key {} is null. return."sv, key_);
                     break;
                 }
                 page_setting->button_press_modify = button_press_modify_;
+                if (key_ == key_bottom_action_) {
+                    updateBottomColor = true;
+                }
             }
 
             if (button->IsUp() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_ ||
                                    key_ == key_left_action_)) {
-                logger::debug("configured Key ({}) is up"sv, key_);
                 //set slot back to normal color
-                const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
+                const auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
                 if (page_setting == nullptr) {
                     logger::trace("setting for key {} is null. return."sv, key_);
                     break;
@@ -141,18 +153,13 @@ namespace event {
                 continue;
             }
 
-
             if (button->IsPressed() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==
                                         key_bottom_action_ || key_ == key_left_action_)) {
                 logger::debug("configured Key ({}) pressed"sv, key_);
-
                 const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
-
                 const auto handler = handle::page_handle::get_singleton();
                 const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
                 handler->set_active_page(handler->get_next_page_id(position),position);
-
-                reset_edit();
                 
                 handle::setting_execute::execute_settings(page_setting->slot_settings);
 

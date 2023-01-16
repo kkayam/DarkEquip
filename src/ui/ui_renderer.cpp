@@ -284,10 +284,16 @@ namespace ui {
                     offset_setting->offset_slot_y,
                     std::to_string(slot_settings.front()->item_count).c_str());
             }
-            if (auto slot_settings = page_setting->slot_settings;
-                !slot_settings.empty() && slot_settings.front()->form->Is(RE::FormType::Shout)) {
+            auto slot_settings = page_setting->slot_settings;
+            auto form = slot_settings.front()->form;
+            const auto spell = form->As<RE::SpellItem>();
+            if (!slot_settings.empty() && 
+            (form->Is(RE::FormType::Shout)||
+            (form->Is(RE::FormType::Spell) && 
+            (spell->GetSpellType() == RE::MagicSystem::SpellType::kPower || 
+            spell->GetSpellType() == RE::MagicSystem::SpellType::kLesserPower)))) { // IF FORM IS SHOUT OR POWER (SPELL)
                 const auto extra_y = config::mcm_setting::get_slot_count_text_offset();
-                std::string text = slot_settings.front()->form->GetName();
+                std::string text = form->GetName();
                 
                 if (text.length() > 10){
                     text = text.substr(0, 10) + "...";
@@ -343,7 +349,7 @@ namespace ui {
             return;
 
         if (const auto ui = RE::UI::GetSingleton(); !ui || ui->GameIsPaused() || !ui->IsCursorHiddenWhenTopmost() ||
-                                                    !ui->IsShowingMenus() || !ui->GetMenu<RE::HUDMenu>()) {
+                                                    !ui->IsShowingMenus() || !ui->GetMenu<RE::HUDMenu>() || !ui->) {
             return;
         }
 

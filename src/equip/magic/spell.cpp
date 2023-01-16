@@ -72,60 +72,23 @@ namespace magic {
         }
 
         //maybe check if the spell is already equipped
-        const auto actor = a_player->As<RE::Actor>();
-        auto casting_type = spell->GetCastingType();
-        logger::trace("spell {} is type {}"sv, spell->GetName(), static_cast<uint32_t>(casting_type));
-        if (a_action == action_type::instant && casting_type != RE::MagicSystem::CastingType::kConcentration) {
-            //might cost nothing if nothing has been equipped into tha hands after start, so it seems
-            auto cost = spell->CalculateMagickaCost(a_player);
-            logger::trace("spell cost for {} is {}"sv, spell->GetName(), fmt::format(FMT_STRING("{:.2f}"), cost));
-
-            float current_magicka = a_player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kMagicka);
-            logger::trace("got temp magicka {}, cost {}"sv, current_magicka, cost);
-
-            if (current_magicka < cost) {
-                offset::flash_hud_menu_meter(RE::ActorValue::kMagicka);
-                logger::warn("not enough magicka for spell {}, magicka {}, cost {} return."sv,
-                    a_form->GetName(),
-                    current_magicka,
-                    cost);
+        if (left) {
+            if (const auto obj_left = a_player->GetActorRuntimeData().currentProcess->GetEquippedLeftHand();
+                obj_left && obj_left->formID == spell->formID) {
+                logger::debug("Object {} already equipped. return."sv, spell->GetName());
                 return;
             }
-
-            a_player->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage,
-                RE::ActorValue::kMagicka,
-                -cost);
-
-            //could trigger an animation here
-            //might need to set some things
-            //TODO make an animation to play here
-            //a_player->NotifyAnimationGraph("RightCastSelf");
-            actor->GetMagicCaster(get_casting_source(a_slot))->CastSpellImmediate(spell,
-                false,
-                actor,
-                1.0f,
-                false,
-                0.0f,
-                nullptr);
         } else {
-            if (left) {
-                if (const auto obj_left = a_player->GetActorRuntimeData().currentProcess->GetEquippedLeftHand();
-                    obj_left && obj_left->formID == spell->formID) {
-                    logger::debug("Object {} already equipped. return."sv, spell->GetName());
-                    return;
-                }
-            } else {
-                if (const auto obj_right = a_player->GetActorRuntimeData().currentProcess->GetEquippedRightHand();
-                    obj_right && obj_right->formID == spell->formID) {
-                    logger::debug("Object {} already equipped. return."sv, spell->GetName());
-                    return;
-                }
+            if (const auto obj_right = a_player->GetActorRuntimeData().currentProcess->GetEquippedRightHand();
+                obj_right && obj_right->formID == spell->formID) {
+                logger::debug("Object {} already equipped. return."sv, spell->GetName());
+                return;
             }
-
-            //other slot options like i thought did not work, so i get it like this now
-            const auto equip_manager = RE::ActorEquipManager::GetSingleton();
-            equip_manager->EquipSpell(a_player, spell, a_slot);
         }
+
+        //other slot options like i thought did not work, so i get it like this now
+        const auto equip_manager = RE::ActorEquipManager::GetSingleton();
+        equip_manager->EquipSpell(a_player, spell, a_slot);
 
         logger::trace("worked spell {}, action {}. return."sv, a_form->GetName(), static_cast<uint32_t>(a_action));
     }

@@ -43,6 +43,7 @@ namespace event {
         uint32_t key_toggle_ = k_invalid;
 
         uint32_t button_press_modify_ = ui::draw_full;
+        bool updateBottomColor = false;
 
         uint32_t edit_active_ = k_invalid;
 

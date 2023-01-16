@@ -194,23 +194,23 @@ namespace handle {
                         auto item_data_helper = new data_helper();
                         item_data_helper->form = RE::TESForm::LookupByID(form->formID);
                         item_data_helper->action_type = handle::slot_setting::acton_type::default_action;
-                if (const auto spell = form->As<RE::SpellItem>();
-                    spell->GetSpellType() == RE::MagicSystem::SpellType::kPower ||
-                    spell->GetSpellType() == RE::MagicSystem::SpellType::kLesserPower){ // IF POWER
-                        std::vector<data_helper*> data;
-                        item_data_helper->type = handle::slot_setting::slot_type::power;
-                        item_data_helper->left = true;
-                        data.push_back(item_data_helper);
-                        handle::set_data::set_single_slot(slot_index_left,page_setting::position::top,data);
-                        slot_index_top++;
-                    } else { // IF SPELL
-                        std::vector<data_helper*> data;
-                        item_data_helper->type = handle::slot_setting::slot_type::magic;
-                        item_data_helper->left = true;
-                        data.push_back(item_data_helper);
-                        handle::set_data::set_single_slot(slot_index_left,page_setting::position::left,data);
-                        slot_index_left++;
-                    }
+                        if (const auto spell = form->As<RE::SpellItem>();
+                            spell->GetSpellType() == RE::MagicSystem::SpellType::kPower ||
+                            spell->GetSpellType() == RE::MagicSystem::SpellType::kLesserPower){ // IF POWER
+                                std::vector<data_helper*> data;
+                                item_data_helper->type = handle::slot_setting::slot_type::power;
+                                item_data_helper->left = true;
+                                data.push_back(item_data_helper);
+                                handle::set_data::set_single_slot(slot_index_top,page_setting::position::top,data);
+                                slot_index_top++;
+                            } else { // IF SPELL
+                                std::vector<data_helper*> data;
+                                item_data_helper->type = handle::slot_setting::slot_type::magic;
+                                item_data_helper->left = true;
+                                data.push_back(item_data_helper);
+                                handle::set_data::set_single_slot(slot_index_left,page_setting::position::left,data);
+                                slot_index_left++;
+                            }
             }
             if (form->Is(RE::FormType::Shout)) {
                 std::vector<data_helper*> data;
