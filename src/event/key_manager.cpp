@@ -160,42 +160,11 @@ namespace event {
             }
 
 
-
             if (button->IsPressed() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==
                                         key_bottom_action_ || key_ == key_left_action_)) {
                 logger::debug("configured Key ({}) pressed"sv, key_);
 
-                const auto edit_handle = handle::edit_handle::get_singleton();
                 const auto page_setting = handle::setting_execute::get_page_setting_for_key(key_);
-                auto edit_page = edit_handle->get_page();
-                auto edit_position = edit_handle->get_position();
-                if (const auto page_handle = handle::page_handle::get_singleton();
-                    edit_position == page_setting->pos && edit_page == page_handle->
-                    get_active_page_id(edit_position) && key_ == edit_active_) {
-                    const auto message = fmt::format("Exit Edit Mode for Position {}, persisting Setting."sv,
-                        static_cast<uint32_t>(page_setting->pos));
-                    RE::DebugNotification(message.c_str());
-
-                    const auto edit_data = edit_handle->get_hold_data();
-                    logger::trace("edit was active, setting new configuration for page {}, position {}, data size {}"sv,
-                        edit_page,
-                        static_cast<uint32_t>(edit_position),
-                        edit_data.size());
-
-                    handle::set_data::set_single_slot(edit_page,
-                        edit_position,
-                        edit_data);
-
-                    //remove everything
-                    reset_edit();
-                    break;
-                }
-
-                if (page_setting == nullptr) {
-                    logger::trace("setting for key {} is null. return."sv, key_);
-                    break;
-                }
-
 
                 const auto handler = handle::page_handle::get_singleton();
                 const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);

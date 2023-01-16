@@ -15,31 +15,7 @@ namespace handle {
     void set_data::read_and_set_data() {
         logger::trace("Setting handlers ..."sv);
 
-        auto key_pos = key_position::get_singleton();
-        key_pos->init_key_position_map();
-
-        //set empty for each position, it will be overwritten if it is configured
-        for (auto i = 0; i < util::page_count; ++i) {
-            for (auto j = 0; j < static_cast<int>(page_setting::position::total); ++j) {
-                set_empty_slot(i, j, key_pos);
-            }
-        }
-
-        logger::trace("continue with overwriting data from configuration ..."sv);
-        custom::read_setting();
-
-        for (const auto sections = util::helper::get_configured_section_page_names(); const auto& section : sections) {
-            set_slot(custom::get_page_by_section(section),
-                static_cast<page_setting::position>(custom::get_position_by_section(section)),
-                custom::get_item_form_by_section(section),
-                custom::get_type_by_section(section),
-                custom::get_hand_selection_by_section(section),
-                custom::get_slot_action_by_section(section),
-                custom::get_item_form_left_by_section(section),
-                custom::get_type_left_by_section(section),
-                custom::get_slot_action_left_by_section(section),
-                key_pos);
-        }
+        page_handle::get_singleton()->compile_pages();
         logger::trace("done setting. return."sv);
     }
 

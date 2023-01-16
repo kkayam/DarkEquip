@@ -52,22 +52,13 @@ namespace ui {
             ImVec2 a_size,
             float a_angle,
             ImU32 a_color = IM_COL32_WHITE);
-        static void draw_hud(float a_x, float a_y);
-        static void draw_slot(float a_x, float a_y, float a_offset_x, float a_offset_y, uint32_t a_modify);
+        static void draw_slot(float a_x, float a_y, float a_offset_x, float a_offset_y,const uint32_t a_opacity, uint32_t a_modify);
         static void draw_slots(float a_x, float a_y, const std::map<position, page_setting*>& a_settings);
-        static void draw_key(float a_x, float a_y, float a_offset_x, float a_offset_y);
-        static void draw_keys(float a_x, float a_y, const std::map<position, page_setting*>& a_settings);
         static void draw_icon(float a_x,
             float a_y,
             float a_offset_x,
             float a_offset_y,
             icon_image_type a_type,
-            uint32_t a_opacity);
-        static void draw_key_icon(float a_x,
-            float a_y,
-            float a_offset_x,
-            float a_offset_y,
-            uint32_t a_key,
             uint32_t a_opacity);
         static void draw_ui();
         static bool load_texture_from_file(const char* filename,

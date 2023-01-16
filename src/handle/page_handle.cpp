@@ -236,13 +236,13 @@ namespace handle {
         // ReSharper disable once CppIncompleteSwitchStatement
         switch (a_position) {
             case page_setting::position::top:
-                offset_y = -a_setting;
+                offset_y = -a_setting+20;
                 break;
             case page_setting::position::right:
                 offset_x = a_setting;
                 break;
             case page_setting::position::bottom:
-                offset_y = a_setting;
+                offset_y = a_setting-20;
                 break;
             case page_setting::position::left:
                 offset_x = -a_setting;
