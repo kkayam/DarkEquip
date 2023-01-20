@@ -5,6 +5,7 @@
 #include "handle/key_position.h"
 #include "handle/set_data.h"
 #include "setting/mcm_setting.h"
+#include "equip/equip_slot.h"
 
 namespace event {
     using event_result = RE::BSEventNotifyControl;
@@ -106,11 +107,19 @@ namespace event {
                 continue;
             }
 
-            // TOGGLE POTION IF HOLD?
-            // if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() &&
-            //     key_ == key_bottom_action_) {
-
-            // }
+            // dual wield if hold
+            if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() && key_ == key_left_action_) {
+                auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
+                auto slot_setting = page_setting->slot_settings.front();
+                std::vector<handle::slot_setting*> settings;
+                if (slot_setting->form->Is(RE::FormType::Spell)){
+                    slot_setting->equip_slot = item::equip_slot::get_right_hand_slot();
+                    settings.push_back(slot_setting);
+                    handle::setting_execute::execute_settings(settings);
+                    slot_setting->equip_slot = item::equip_slot::get_left_hand_slot();
+                }
+                break;
+            }
 
             if (updateBottomColor){
                 //set slot back to normal color
@@ -149,12 +158,8 @@ namespace event {
             }
 
 
-            if (!button->IsDown()) {
-                continue;
-            }
-
-            if (button->IsPressed() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==
-                                        key_bottom_action_ || key_ == key_left_action_)) {
+            if (button->IsUp() && button->HeldDuration() < config::mcm_setting::get_config_button_hold_time() && 
+            (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==key_bottom_action_ || key_ == key_left_action_)) {
                 logger::debug("configured Key ({}) pressed"sv, key_);
                 const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
 
