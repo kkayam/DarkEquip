@@ -227,11 +227,16 @@ namespace handle {
         data->active_page_max[static_cast<int32_t>(page_setting::position::left)] = slot_index_left;
         data->active_page_max[static_cast<int32_t>(page_setting::position::bottom)] = slot_index_bottom;
         data->active_page_max[static_cast<int32_t>(page_setting::position::top)] = slot_index_top;
+        data->active_page[0] = static_cast<int32_t>(data->active_page[0])<slot_index_top?data->active_page[0]:0;
+        data->active_page[1] = static_cast<int32_t>(data->active_page[1])<slot_index_right?data->active_page[1]:0;
+        data->active_page[2] = static_cast<int32_t>(data->active_page[2])<slot_index_bottom?data->active_page[2]:0;
+        data->active_page[3] = static_cast<int32_t>(data->active_page[3])<slot_index_left?data->active_page[3]:0;
     }
     
 
     uint32_t page_handle::get_next_page_id(const page_setting::position a_position) const {
         page_handle_data* data = this->data_;
+        if (data->active_page_max[static_cast<int32_t>(a_position)] == 0) return 0;
         return (data->active_page[static_cast<int32_t>(a_position)]+1)%(data->active_page_max[static_cast<int32_t>(a_position)]);
     }
 

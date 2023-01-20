@@ -269,6 +269,7 @@ namespace ui {
                 offset_setting->offset_slot_y,
                 page_setting->icon_opacity,
                 page_setting->button_press_modify);
+            if (auto form = page_setting->slot_settings.front()->form;!form) continue;
             draw_icon(a_x,
                 a_y,
                 offset_setting->offset_slot_x,
