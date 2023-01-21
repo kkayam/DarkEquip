@@ -159,7 +159,9 @@ namespace handle {
         int slot_index_left = 0;
         int slot_index_bottom = 0;
         int slot_index_top = 0;
-        for (const auto& [item, inv_data] : player->GetInventory()) {
+        for (const auto& [item, inv_data] : player->GetInventory([](const RE::TESBoundObject& a_object) { 
+                return a_object.Is(RE::FormType::AlchemyItem,RE::FormType::Weapon,RE::FormType::Armor);
+            })) {
             if (const auto& [count, entry] = inv_data; entry->IsFavorited() ) {
                 std::vector<data_helper*> data;
                 auto item_data_helper = new data_helper();
