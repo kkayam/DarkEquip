@@ -46,7 +46,5 @@ namespace event {
         bool updateBottomColor = false;
 
         uint32_t edit_active_ = k_invalid;
-
-        void reset_edit();
     };
 }

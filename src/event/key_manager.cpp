@@ -39,17 +39,10 @@ namespace event {
             return event_result::kContinue;
         }
 
-        if (!a_event) {
-            return event_result::kContinue;
-        }
-
-        const auto ui = RE::UI::GetSingleton();
-        if (!ui) {
-            return event_result::kContinue;
-        }
         const auto interface_strings = RE::InterfaceStrings::GetSingleton();
-
-        if (ui->IsMenuOpen(interface_strings->console)) {
+        const auto ui = RE::UI::GetSingleton();
+        
+        if (!a_event || !ui || ui->IsMenuOpen(interface_strings->console)) {
             return event_result::kContinue;
         }
 
@@ -155,23 +148,20 @@ namespace event {
                     break;
                 }
                 page_setting->button_press_modify = ui::draw_full;
-            }
+                if (button->HeldDuration() < config::mcm_setting::get_config_button_hold_time()) {
+                    logger::debug("configured Key ({}) pressed"sv, key_);
+                    const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
 
+                    const auto handler = handle::page_handle::get_singleton();
+                    const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
+                    if(key_ !=key_bottom_action_){
+                        handler->set_active_page(handler->get_next_page_id(position),position);
+                    }
+                    
+                    handle::setting_execute::execute_settings(page_setting->slot_settings);
 
-            if (button->IsUp() && button->HeldDuration() < config::mcm_setting::get_config_button_hold_time() && 
-            (key_ == key_top_action_ || key_ == key_right_action_ || key_ ==key_bottom_action_ || key_ == key_left_action_)) {
-                logger::debug("configured Key ({}) pressed"sv, key_);
-                const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
-
-                const auto handler = handle::page_handle::get_singleton();
-                const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
-                if(key_ !=key_bottom_action_){
-                    handler->set_active_page(handler->get_next_page_id(position),position);
+                    break;
                 }
-                
-                handle::setting_execute::execute_settings(page_setting->slot_settings);
-
-                break;
             }
         }
         return event_result::kContinue;
@@ -242,14 +232,6 @@ namespace event {
         if (a_key == k_invalid) {
             return false;
         }
-        return true;
-    }
-
-    void key_manager::reset_edit() {
-        if (edit_active_ != k_invalid) {
-            //remove everything
-            edit_active_ = k_invalid;
-            handle::edit_handle::get_singleton()->init_edit(handle::page_setting::position::total);
-        }
+            return true;
     }
 }
