@@ -34,6 +34,7 @@ namespace config {
     static bool action_check;
     static bool empty_hand_setting;
     static bool hide_outside_combat;
+    static float fade_timer_outside_combat;
     static bool disable_input_quick_loot;
 
     void mcm_setting::read_setting() {
@@ -84,6 +85,9 @@ namespace config {
             action_check = mcm.GetBoolValue("MiscSetting", "bActionCheck", false);
             empty_hand_setting = mcm.GetBoolValue("MiscSetting", "bEmptyHandSetting", true);
             hide_outside_combat = mcm.GetBoolValue("MiscSetting", "bHideOutsideCombat", false);
+            fade_timer_outside_combat = static_cast<float>(mcm.GetDoubleValue("MiscSetting",
+                "fFadeTimerOutsideCombat",
+                5));
             disable_input_quick_loot = mcm.GetBoolValue("MiscSetting", "bDisableInputQuickLoot", false);
         };
 
@@ -123,5 +127,6 @@ namespace config {
     bool mcm_setting::get_action_check() { return action_check; }
     bool mcm_setting::get_empty_hand_setting() { return empty_hand_setting; }
     bool mcm_setting::get_hide_outside_combat() { return hide_outside_combat; }
+    float mcm_setting::get_fade_timer_outside_combat() { return fade_timer_outside_combat; }
     bool mcm_setting::get_disable_input_quick_loot() { return disable_input_quick_loot; }
 }

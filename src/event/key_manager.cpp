@@ -6,6 +6,8 @@
 #include "handle/set_data.h"
 #include "setting/mcm_setting.h"
 #include "equip/equip_slot.h"
+#include "ui/ui_renderer.h"
+#include "util/helper.h"
 
 namespace event {
     using event_result = RE::BSEventNotifyControl;
@@ -96,10 +98,12 @@ namespace event {
                 continue;
             }
 
-            if (config::mcm_setting::get_hide_outside_combat() && !RE::PlayerCharacter::GetSingleton()->IsInCombat()) {
-                continue;
+            if (config::mcm_setting::get_hide_outside_combat() && !ui::ui_renderer::get_fade() && 
+            (key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_ ||
+                                   key_ == key_left_action_)) {
+                ui::ui_renderer::set_fade(true, 1.f);
             }
-
+            
             // dual wield if hold
             if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() && key_ == key_left_action_) {
                 auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
@@ -142,7 +146,7 @@ namespace event {
             if (button->IsUp() && (key_ == key_top_action_ || key_ == key_right_action_ || key_ == key_bottom_action_ ||
                                    key_ == key_left_action_)) {
                 //set slot back to normal color
-                const auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
+                const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
                 if (page_setting == nullptr) {
                     logger::trace("setting for key {} is null. return."sv, key_);
                     break;
@@ -150,8 +154,6 @@ namespace event {
                 page_setting->button_press_modify = ui::draw_full;
                 if (button->HeldDuration() < config::mcm_setting::get_config_button_hold_time()) {
                     logger::debug("configured Key ({}) pressed"sv, key_);
-                    const auto page_setting = (key_ ==key_bottom_action_) ? handle::setting_execute::get_current_page_setting_for_key(key_) :handle::setting_execute::get_page_setting_for_key(key_);
-
                     const auto handler = handle::page_handle::get_singleton();
                     const auto position = handle::key_position::get_singleton()->get_position_for_key(key_);
                     if(key_ !=key_bottom_action_){

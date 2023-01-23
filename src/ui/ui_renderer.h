@@ -44,8 +44,7 @@ namespace ui {
             float a_offset_x,
             float a_offset_y,
             const char* a_text,
-            float font_size_mul = 1,
-            ImU32 a_color = IM_COL32_WHITE);
+            float font_size_mul = 1);
 
         static void draw_element(ID3D11ShaderResourceView* a_texture,
             ImVec2 a_center,
@@ -84,5 +83,8 @@ namespace ui {
 
         static float get_resolution_width();
         static float get_resolution_height();
+        
+        static void set_fade(bool a_in, float a_value);
+        static bool get_fade();
     };
 }

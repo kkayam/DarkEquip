@@ -33,6 +33,10 @@ namespace ui {
     static std::map<uint32_t, image> default_key_struct;
     static std::map<uint32_t, image> ps_key_struct;
     static std::map<uint32_t, image> xbox_key_struct;
+    
+    float fade = 0.0f;
+    bool fade_in = true;
+    float fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
 
     LRESULT ui_renderer::wnd_proc_hook::thunk(const HWND h_wnd,
         const UINT u_msg,
@@ -183,8 +187,7 @@ namespace ui {
         const float a_offset_x,
         const float a_offset_y,
         const char* a_text,
-        float font_size_mul,
-        const ImU32 a_color) {
+        float font_size_mul) {
         const ImFont* font = ImGui::GetFont();
         const auto font_size = config::mcm_setting::get_slot_count_text_font_size()*font_size_mul;
 
@@ -201,8 +204,9 @@ namespace ui {
         } else {
             position = ImVec2(width_setting + a_offset_x + extra_x, height_setting + a_offset_y + extra_y);
         }
+        const ImU32 color = IM_COL32(draw_full, draw_full, draw_full, static_cast<int>(fade*draw_full));
 
-        ImGui::GetWindowDrawList()->AddText(font, font_size, position, a_color, a_text, nullptr, 0.0f, nullptr);
+        ImGui::GetWindowDrawList()->AddText(font, font_size, position, color, a_text, nullptr, 0.0f, nullptr);
     }
 
     void ui_renderer::draw_element(ID3D11ShaderResourceView* a_texture,
@@ -219,7 +223,6 @@ namespace ui {
 
         };
         constexpr ImVec2 uvs[4] = { ImVec2(0.0f, 0.0f), ImVec2(1.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec2(0.0f, 1.0f) };
-
 
         ImGui::GetWindowDrawList()
             ->AddImageQuad(a_texture, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], a_color);
@@ -252,7 +255,7 @@ namespace ui {
             static_cast<float>(height) * 1.4f * config::mcm_setting::get_hud_image_scale_height() +
             config::file_setting::get_extra_size_for_image());
 
-        const ImU32 color = IM_COL32(a_modify, a_modify, a_modify, a_opacity);
+        const ImU32 color = IM_COL32(a_modify, a_modify, a_modify, static_cast<int>(a_opacity*fade));
 
         draw_element(texture, center, size, angle, color);
     }
@@ -339,7 +342,7 @@ namespace ui {
             static_cast<float>(height) * config::mcm_setting::get_icon_scale_height() +
             config::file_setting::get_extra_size_for_image());
 
-        const ImU32 color = IM_COL32(draw_full, draw_full, draw_full, a_opacity);
+        const ImU32 color = IM_COL32(draw_full, draw_full, draw_full, static_cast<int>(a_opacity*fade));
 
         draw_element(texture, center, size, angle, color);
     }
@@ -360,8 +363,12 @@ namespace ui {
             return;
         }
 
-        if (config::mcm_setting::get_hide_outside_combat() && !RE::PlayerCharacter::GetSingleton()->IsInCombat()) {
-            return;
+        if (config::mcm_setting::get_hide_outside_combat()) {
+            if (!RE::PlayerCharacter::GetSingleton()->IsInCombat()) {
+                fade_in = false;
+            } else {
+                fade_in = true;
+            }
         }
 
 
@@ -375,6 +382,9 @@ namespace ui {
         ImGui::SetNextWindowSize(ImVec2(screen_size_x, screen_size_y));
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f));
 
+        
+        ImGui::GetStyle().Alpha = fade;
+
         ImGui::Begin(hud_name, nullptr, window_flag);
 
         const auto settings = handle::page_handle::get_singleton()->get_active_page();
@@ -382,6 +392,20 @@ namespace ui {
         draw_slots(screen_size_x, screen_size_y, settings);
 
         ImGui::End();
+        
+        if (fade_in) {
+            fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
+
+            fade += 0.01f;
+            if (fade < 1.0f) fade = 1.0f;
+        } else {
+            if (fade_out_timer > 0.0f) {
+                fade_out_timer -= ImGui::GetIO().DeltaTime;
+            } else {
+                fade -= 0.01f;
+                if (fade < 0.0f) fade = 0.0f;
+            }
+        }
     }
 
 
@@ -466,5 +490,18 @@ namespace ui {
     float ui_renderer::get_resolution_width() { return ImGui::GetIO().DisplaySize.x; }
 
     float ui_renderer::get_resolution_height() { return ImGui::GetIO().DisplaySize.y; }
+
+    
+    void ui_renderer::set_fade(const bool a_in, const float a_value) {
+        fade_in = a_in;
+        fade = a_value;
+        if (a_in) {
+            fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
+        }
+    }
+
+    bool ui_renderer::get_fade() {
+        return fade_in;
+    }
 
 }
