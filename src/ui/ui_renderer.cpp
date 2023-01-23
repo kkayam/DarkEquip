@@ -34,7 +34,7 @@ namespace ui {
     static std::map<uint32_t, image> ps_key_struct;
     static std::map<uint32_t, image> xbox_key_struct;
     
-    float fade = 0.0f;
+    float fade = 1.0f;
     bool fade_in = true;
     float fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
 
@@ -290,24 +290,24 @@ namespace ui {
             }
             auto slot_settings = page_setting->slot_settings;
             auto form = slot_settings.front()->form;
-            const auto spell = form->As<RE::SpellItem>();
-            if (!slot_settings.empty() && 
-            (form->Is(RE::FormType::Shout)||
-            (form->Is(RE::FormType::Spell) && 
-            (spell->GetSpellType() == RE::MagicSystem::SpellType::kPower || 
-            spell->GetSpellType() == RE::MagicSystem::SpellType::kLesserPower)))) { // IF FORM IS SHOUT OR POWER (SPELL)
-                const auto extra_y = config::mcm_setting::get_slot_count_text_offset();
+
+            const auto [texture, width, height] = image_struct[static_cast<int32_t>(image_type::round)];
+            const auto size = ImVec2(
+                static_cast<float>(width) * 1.4f * config::mcm_setting::get_hud_image_scale_width() + config::file_setting::get_extra_size_for_image(),
+                static_cast<float>(height) * 1.4f * config::mcm_setting::get_hud_image_scale_height() + config::file_setting::get_extra_size_for_image());
+
+            if (!slot_settings.empty()) {
                 std::string text = form->GetName();
                 
-                if (text.length() > 10){
-                    text = text.substr(0, 10) + "...";
+                if (text.length() > 6){
+                    text = text.substr(0, 6) + "...";
                 }
                 draw_text(a_x,
                     a_y,
-                    offset_setting->offset_slot_x,
-                    offset_setting->offset_slot_y-2*extra_y-30,
+                    offset_setting->offset_slot_x-size[0]/2,
+                    static_cast<float>(offset_setting->offset_slot_y+size[1]/4),
                     text.c_str(),
-                    0.75);
+                    0.7f);
             }
         }
     }
@@ -369,6 +369,8 @@ namespace ui {
             } else {
                 fade_in = true;
             }
+        } else {
+            fade_in = true;
         }
 
 
@@ -393,12 +395,12 @@ namespace ui {
 
         ImGui::End();
         
-        if (fade_in) {
+        if (fade_in && fade != 1.0f) {
             fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
 
             fade += 0.01f;
-            if (fade < 1.0f) fade = 1.0f;
-        } else {
+            if (fade > 1.0f) fade = 1.0f;
+        } else if (!fade_in && fade != 0.0f) {
             if (fade_out_timer > 0.0f) {
                 fade_out_timer -= ImGui::GetIO().DeltaTime;
             } else {

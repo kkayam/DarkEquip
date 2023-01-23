@@ -2,6 +2,7 @@
 #include "equip/equip_slot.h"
 #include "util/string_util.h"
 #include "handle/set_data.h"
+#include "setting/mcm_setting.h"
 
 namespace handle {
     page_handle* page_handle::get_singleton() {
@@ -30,13 +31,6 @@ namespace handle {
 
         auto* page = new page_setting();
         page->pos = a_position;
-
-        /*auto* fade = new fade_setting();
-        fade->action = fade_setting::action::unset;
-        fade->alpha = fade_setting::alpha::max;
-        fade->current_alpha = static_cast<uint32_t>(fade_setting::alpha::max);
-
-        page->fade_setting = fade;*/
 
         auto* slots = new std::vector<slot_setting*>;
         for (const auto element : data_helpers) {
@@ -128,17 +122,72 @@ namespace handle {
     }
 
     std::map<page_setting::position, page_setting*> page_handle::get_active_page() const {
-        if (const page_handle_data* data = this->data_; data && !data->page_settings.empty()) {
-            std::map<page_setting::position, page_setting*> active_page;
-            for (int32_t i = 0; i < 4; i++)
-            {
-                std::map<page_setting::position, page_setting*> tmp = data->page_settings.at(data->active_page[i]);
-                active_page[static_cast<page_setting::position>(i)] = tmp[static_cast<page_setting::position>(i)];
-            }
+        std::map<page_setting::position, page_setting*> active_page;
+        const auto a_player = RE::PlayerCharacter::GetSingleton();
+
+        const auto right_equipped_object = a_player->GetEquippedObject(false);
+        const auto left_equipped_object = a_player->GetEquippedObject(true);
+        const auto selected_power = a_player->GetActorRuntimeData().selectedPower;
+
+        for (int32_t i = 0; i < 4; i++)
+        {
+            if (i==2) continue;
+            auto* page = new page_setting();
+            page->pos = static_cast<page_setting::position>(i);
             
-            return active_page;
+            float offset_x = 0.f;
+            float offset_y = 0.f;
+
+            get_offset_values(page->pos, config::mcm_setting::get_hud_slot_position_offset(), offset_x, offset_y);
+
+            auto* offset = new offset_setting();
+            offset->offset_slot_x = offset_x;
+            offset->offset_slot_y = offset_y;
+
+            get_offset_values(page->pos, config::mcm_setting::get_hud_key_position_offset(), offset_x, offset_y);
+            offset->offset_key_x = offset_x;
+            offset->offset_key_y = offset_y;
+            page->offset_setting = offset;
+
+            auto* slot = new slot_setting();
+            if(i==0 && selected_power != nullptr){
+                slot->form = selected_power;
+                slot->type = handle::slot_setting::slot_type::power;
+                if(selected_power->Is(RE::FormType::Shout)) {slot->type = handle::slot_setting::slot_type::shout;}
+                page->icon_type = get_icon_type(slot->type, slot->form);
+                page->icon_opacity = config::mcm_setting::get_icon_opacity();
+            } else if (i == 1 && right_equipped_object != nullptr) {
+                slot->form = right_equipped_object;
+                if(right_equipped_object->IsWeapon()) {slot->type = handle::slot_setting::slot_type::weapon;}
+                else if(right_equipped_object->Is(RE::FormType::Spell)) {slot->type = handle::slot_setting::slot_type::magic;}
+                else if(right_equipped_object->IsArmor()){slot->type = handle::slot_setting::slot_type::shield;}
+                page->icon_type = get_icon_type(slot->type, slot->form);
+                page->icon_opacity = config::mcm_setting::get_icon_opacity();
+            } else if (i== 3 && left_equipped_object != nullptr) {
+                slot->form = left_equipped_object;
+                if(left_equipped_object->IsWeapon()) {slot->type = handle::slot_setting::slot_type::weapon;}
+                else if(left_equipped_object->Is(RE::FormType::Spell)) {slot->type = handle::slot_setting::slot_type::magic;}
+                else if(left_equipped_object->IsArmor()){slot->type = handle::slot_setting::slot_type::shield;}
+                page->icon_type = get_icon_type(slot->type, slot->form);
+                page->icon_opacity = config::mcm_setting::get_icon_opacity();
+            } else {
+                slot->form = nullptr;
+                slot->type = slot_setting::slot_type::unset;
+                page->icon_type = get_icon_type(slot->type, slot->form);
+                page->icon_opacity = config::mcm_setting::get_icon_opacity();
+            }
+            std::vector<slot_setting*> slots = {slot};
+            page->slot_settings = slots;
+
+            active_page[page->pos] = page;
         }
-        return {};
+
+        if (const page_handle_data* data = this->data_; data && !data->page_settings.empty()) {
+            std::map<page_setting::position, page_setting*> tmp = data->page_settings.at(data->active_page[2]);
+            active_page[static_cast<page_setting::position>(2)] = tmp[static_cast<page_setting::position>(2)];
+        }
+        
+        return active_page;
     }
 
     uint32_t page_handle::get_active_page_id(const page_setting::position a_position) const {
