@@ -37,6 +37,7 @@ namespace ui {
     float fade = 1.0f;
     bool fade_in = true;
     float fade_out_timer = config::mcm_setting::get_fade_timer_outside_combat();
+    float refresh_gui = 3.0f; // GUI is refreshed every 3 seconds in case items are changed 👍
 
     LRESULT ui_renderer::wnd_proc_hook::thunk(const HWND h_wnd,
         const UINT u_msg,
@@ -388,6 +389,14 @@ namespace ui {
         ImGui::GetStyle().Alpha = fade;
 
         ImGui::Begin(hud_name, nullptr, window_flag);
+
+        
+        if (refresh_gui > 0.0f) {
+            refresh_gui -= ImGui::GetIO().DeltaTime;
+        } else {
+            handle::page_handle::get_singleton()->refresh_active_page();
+            refresh_gui = 3.0f;
+        }
 
         const auto settings = handle::page_handle::get_singleton()->get_active_page();
 

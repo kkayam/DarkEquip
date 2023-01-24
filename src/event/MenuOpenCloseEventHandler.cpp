@@ -19,6 +19,7 @@ namespace event {
             if(a_event->menuName == "InventoryMenu" || a_event->menuName == "MagicMenu"){
                 const auto handler = handle::page_handle::get_singleton();
                 handler->compile_pages();
+                handler->refresh_active_page();
             }
         }
         return RE::BSEventNotifyControl::kContinue;

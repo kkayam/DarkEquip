@@ -120,8 +120,7 @@ namespace handle {
         }
         return {};
     }
-
-    std::map<page_setting::position, page_setting*> page_handle::get_active_page() const {
+    void page_handle::refresh_active_page() const {
         std::map<page_setting::position, page_setting*> active_page;
         const auto a_player = RE::PlayerCharacter::GetSingleton();
 
@@ -186,8 +185,17 @@ namespace handle {
             std::map<page_setting::position, page_setting*> tmp = data->page_settings.at(data->active_page[2]);
             active_page[static_cast<page_setting::position>(2)] = tmp[static_cast<page_setting::position>(2)];
         }
-        
-        return active_page;
+
+        if (page_handle_data* data = this->data_; data) {
+            data->active_page_ = active_page;
+        }
+    }
+
+    std::map<page_setting::position, page_setting*> page_handle::get_active_page() const {
+        if (const page_handle_data* data = this->data_; data) {
+            return data->active_page_;
+        }
+        return {};
     }
 
     uint32_t page_handle::get_active_page_id(const page_setting::position a_position) const {

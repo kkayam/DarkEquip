@@ -23,6 +23,7 @@ namespace handle {
         [[nodiscard]] std::map<page_setting::position, page_setting*> get_page(uint32_t a_page) const;
         [[nodiscard]] std::map<uint32_t, std::map<page_setting::position, page_setting*>> get_pages() const;
         [[nodiscard]] std::map<page_setting::position, page_setting*> get_active_page() const;
+        [[nodiscard]] void refresh_active_page() const;
         [[nodiscard]] uint32_t get_active_page_id(const page_setting::position a_position) const;
         [[nodiscard]] uint32_t get_next_page_id(const page_setting::position a_position) const;
         void compile_pages() const;
@@ -59,6 +60,7 @@ namespace handle {
             std::map<uint32_t, std::map<page_setting::position, page_setting*>> page_settings;
             uint32_t active_page[4] = {0,0,0,0};
             uint32_t active_page_max[4] = {1,1,1,1};
+            std::map<page_setting::position, page_setting*> active_page_; // active page used by the ui for rendering
         };
 
         page_handle_data* data_;

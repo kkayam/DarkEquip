@@ -105,17 +105,26 @@ namespace event {
             }
             
             // dual wield if hold
-            if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time() && key_ == key_left_action_) {
-                auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
-                auto slot_setting = page_setting->slot_settings.front();
-                std::vector<handle::slot_setting*> settings;
-                if (slot_setting->form->Is(RE::FormType::Spell)){
-                    slot_setting->equip_slot = item::equip_slot::get_right_hand_slot();
-                    settings.push_back(slot_setting);
-                    handle::setting_execute::execute_settings(settings);
-                    slot_setting->equip_slot = item::equip_slot::get_left_hand_slot();
+            if (button->IsHeld() && button->HeldDuration() >= config::mcm_setting::get_config_button_hold_time()) {
+                if (key_ == key_left_action_){
+                    auto page_setting = handle::setting_execute::get_current_page_setting_for_key(key_);
+                    auto slot_setting = page_setting->slot_settings.front();
+                    std::vector<handle::slot_setting*> settings;
+                    if (slot_setting->form->Is(RE::FormType::Spell)){
+                        slot_setting->equip_slot = item::equip_slot::get_right_hand_slot();
+                        settings.push_back(slot_setting);
+                        handle::setting_execute::execute_settings(settings);
+                        slot_setting->equip_slot = item::equip_slot::get_left_hand_slot();
+                        const auto handler = handle::page_handle::get_singleton();
+                        handler->refresh_active_page();
+                    }
+                    break;
                 }
-                break;
+                else if (key_ == key_bottom_action_){
+                    const auto handler = handle::page_handle::get_singleton();
+                    handler->set_active_page(handler->get_next_page_id(position),position);
+                    handler->refresh_active_page();
+                }
             }
 
             if (updateBottomColor){
@@ -161,6 +170,8 @@ namespace event {
                     }
                     
                     handle::setting_execute::execute_settings(page_setting->slot_settings);
+
+                    handler->refresh_active_page();
 
                     break;
                 }
